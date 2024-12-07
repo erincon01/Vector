@@ -8,12 +8,12 @@ using System.Globalization;
 [SqlUserDefinedType(Format.UserDefined, IsByteOrdered = true, MaxByteSize = -1)]
 public class Vector : INullable, IBinarySerialize
 {
-    private double[] _values;
+    private float[] _values;
 
     // Default constructor
     public Vector()
     {
-        _values = Array.Empty<double>();
+        _values = Array.Empty<float>();
     }
 
     public int Size()
@@ -48,10 +48,10 @@ public class Vector : INullable, IBinarySerialize
                 // Remove initial and final brackets
                 string trimmedInput = inputValue.Substring(1, inputValue.Length - 2);
 
-                // Split elements by commas and convert them to double
+                // Split elements by commas and convert them to float
                 vector._values = trimmedInput
                     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(v => double.Parse(v, CultureInfo.InvariantCulture))
+                    .Select(v => float.Parse(v, CultureInfo.InvariantCulture))
                     .ToArray();
             }
             else
@@ -59,7 +59,7 @@ public class Vector : INullable, IBinarySerialize
                 // if it is not JSON-like, interpret as a comma separated list
                 vector._values = inputValue
                     .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(v => double.Parse(v, CultureInfo.InvariantCulture))
+                    .Select(v => float.Parse(v, CultureInfo.InvariantCulture))
                     .ToArray();
             }
         }
@@ -89,10 +89,10 @@ public class Vector : INullable, IBinarySerialize
     public void Read(System.IO.BinaryReader reader)
     {
         int length = reader.ReadInt32();
-        _values = new double[length];
+        _values = new float[length];
         for (int i = 0; i < length; i++)
         {
-            _values[i] = reader.ReadDouble();
+            _values[i] = reader.ReadSingle();
         }
     }
 
@@ -106,7 +106,7 @@ public class Vector : INullable, IBinarySerialize
     }
 
     // Function to calculate distance between two vectors
-    public static double VectorDistance(string distanceMetric, Vector vector1, Vector vector2)
+    public static float VectorDistance(string distanceMetric, Vector vector1, Vector vector2)
     {
         if (vector1 == null || vector2 == null || vector1._values.Length != vector2._values.Length)
         {
@@ -131,32 +131,32 @@ public class Vector : INullable, IBinarySerialize
     }
 
     // Distance methods and operations between vectors...
-    private static double CosineDistance(double[] v1, double[] v2)
+    private static float CosineDistance(float[] v1, float[] v2)
     {
-        double dot = DotProduct(v1, v2);
-        double norm1 = Math.Sqrt(DotProduct(v1, v1));
-        double norm2 = Math.Sqrt(DotProduct(v2, v2));
+        float dot = DotProduct(v1, v2);
+        float norm1 = (float)Math.Sqrt(DotProduct(v1, v1));
+        float norm2 = (float)Math.Sqrt(DotProduct(v2, v2));
 
         if (norm1 == 0 || norm2 == 0)
-            return 1.0;
+            return 1.0f;
 
-        return 1.0 - (dot / (norm1 * norm2));
+        return 1.0f - (dot / (norm1 * norm2));
     }
 
-    private static double EuclideanDistance(double[] v1, double[] v2)
+    private static float EuclideanDistance(float[] v1, float[] v2)
     {
-        double sum = 0.0;
+        float sum = 0.0f;
         for (int i = 0; i < v1.Length; i++)
         {
-            double diff = v1[i] - v2[i];
+            float diff = v1[i] - v2[i];
             sum += diff * diff;
         }
-        return Math.Sqrt(sum);
+        return (float)Math.Sqrt(sum);
     }
 
-    private static double DotProduct(double[] v1, double[] v2)
+    private static float DotProduct(float[] v1, float[] v2)
     {
-        double result = 0.0;
+        float result = 0.0f;
         for (int i = 0; i < v1.Length; i++)
         {
             result += v1[i] * v2[i];
@@ -164,9 +164,9 @@ public class Vector : INullable, IBinarySerialize
         return result;
     }
 
-    private static double ManhattanDistance(double[] v1, double[] v2)
+    private static float ManhattanDistance(float[] v1, float[] v2)
     {
-        double distance = 0.0;
+        float distance = 0.0f;
         for (int i = 0; i < v1.Length; i++)
         {
             distance += Math.Abs(v1[i] - v2[i]);

@@ -43,7 +43,7 @@ CREATE FUNCTION dbo.VECTOR_DISTANCE
     @v1 Vector,
     @v2 Vector
 )
-RETURNS FLOAT
+RETURNS REAL
 AS EXTERNAL NAME myVector.Vector.VectorDistance;
 GO
 

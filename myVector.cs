@@ -106,11 +106,16 @@ public class Vector : INullable, IBinarySerialize
     }
 
     // Function to calculate distance between two vectors
-    public static float VectorDistance(string distanceMetric, Vector vector1, Vector vector2)
+    public static SqlSingle VectorDistance(string distanceMetric, Vector vector1, Vector vector2)
     {
-        if (vector1 == null || vector2 == null || vector1._values.Length != vector2._values.Length)
+
+        if (vector1.IsNull == true || vector2.IsNull == true)
         {
-            throw new ArgumentException("Vectors must be non-null and of the same length.");
+            return SqlSingle.Null;
+        }
+        if (vector1._values.Length != vector2._values.Length)
+        {
+            throw new ArgumentException($"The vector dimensions {vector1._values.Length} and {vector2._values.Length} do not match.");
         }
 
         distanceMetric = distanceMetric.ToLower();
@@ -118,13 +123,13 @@ public class Vector : INullable, IBinarySerialize
         switch (distanceMetric)
         {
             case "cosine":
-                return CosineDistance(vector1._values, vector2._values);
+                return new SqlSingle(CosineDistance(vector1._values, vector2._values));
             case "euclidean":
-                return EuclideanDistance(vector1._values, vector2._values);
+                return new SqlSingle(EuclideanDistance(vector1._values, vector2._values));
             case "dot":
-                return -DotProduct(vector1._values, vector2._values);
+                return new SqlSingle(-DotProduct(vector1._values, vector2._values));
             case "manhattan":
-                return ManhattanDistance(vector1._values, vector2._values);
+                return new SqlSingle(ManhattanDistance(vector1._values, vector2._values));
             default:
                 throw new ArgumentException($"Unsupported distance metric: {distanceMetric}");
         }
